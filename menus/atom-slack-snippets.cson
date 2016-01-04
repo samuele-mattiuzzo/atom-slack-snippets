@@ -1,0 +1,7 @@
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Post snippet to Slack'
+      'command': 'atom-slack-snippets:post'
+    }
+  ]
