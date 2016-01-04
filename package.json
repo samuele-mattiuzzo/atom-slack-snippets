@@ -11,5 +11,5 @@
   },
   "dependencies": {
     "request-promise": "1.0.2"
-  },
+  }
 }
