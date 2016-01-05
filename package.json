@@ -10,6 +10,7 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "request-promise": "1.0.2"
+    "request-promise": "1.0.2",
+    "atom-space-pen-views": "2.1.0"
   }
 }
