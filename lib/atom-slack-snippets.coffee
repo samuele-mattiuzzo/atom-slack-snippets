@@ -2,6 +2,7 @@ request = require 'request-promise'
 {CompositeDisposable} = require 'atom'
 AtomSlackSnippetsView = require './atom-slack-snippets-view'
 
+
 module.exports =
 
   config:
@@ -23,22 +24,34 @@ module.exports =
       @token = atom.config.get('atom-slack-snippets.token')
       @channels = []
       @users = []
+      @_getAllItems()
 
   deactivate: ->
       @destroy()
 
   destroy: ->
       @view = null
-      @channels = []
-      @users = []
+      @channels = null
+      @users = null
+      @subscriptions = null
 
   post: ->
       if @token?
-          if @channels.length > 0 then '' else @_getChannels()
-          if @users.length > 0 then '' else @_getUsers()
           editor = atom.workspace.getActivePaneItem()
           selection = editor.getSelectedText()
           @view = new AtomSlackSnippetsView(@channels, @users, @token, selection)
+
+  _getAllItems: ->
+      # loops till we have channels and users to post to,
+      # then quits
+      # needs improvement or better logic elsewhere, otherwise blocks
+      # atom's loading for a bit too much
+      if @channels.length == 0 and @users.length == 0
+          console.log('fetching')
+          @_getChannels()
+          @_getUsers()
+          setTimeout @_getAllItems.bind(@), 5 * 1000
+      console.log('ok')
 
   _getChannels: ->
       request({
