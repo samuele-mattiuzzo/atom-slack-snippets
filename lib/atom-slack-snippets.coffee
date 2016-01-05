@@ -1,4 +1,4 @@
-{request} = require 'request-promise'
+request = require 'request-promise'
 {CompositeDisposable} = require 'atom'
 AtomSlackSnippetsView = require './atom-slack-snippets-view'
 
@@ -10,21 +10,32 @@ module.exports =
           default: ''
 
   activate: (state) ->
+      @setUp()
+      @subscriptions = new CompositeDisposable
+      @subscriptions.add atom.config.onDidChange 'token', =>
+          @destroy()
+          @setUp()
+
+      @subscriptions.add atom.commands.add 'atom-workspace',
+          'atom-slack-snippets:post': => @post()
+
+  setUp: ->
       @token = atom.config.get('atom-slack-snippets.token')
       @channels = []
       @users = []
 
-      atom.commands.add('atom-workspace', 'atom-slack-snippets:post', => @post())
-
   deactivate: ->
+      @destroy()
+
+  destroy: ->
       @view = null
-      @channels = null
-      @users = null
+      @channels = []
+      @users = []
 
   post: ->
       if @token?
-          @_getChannels()
-          @_getUsers()
+          if @channels.length > 0 then '' else @_getChannels()
+          if @users.length > 0 then '' else @_getUsers()
           editor = atom.workspace.getActivePaneItem()
           selection = editor.getSelectedText()
           @view = new AtomSlackSnippetsView(@channels, @users, @token, selection)

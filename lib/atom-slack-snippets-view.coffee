@@ -1,4 +1,4 @@
-{request} = require 'request-promise'
+request = require 'request-promise'
 {SelectListView} = require 'atom-space-pen-views'
 
 
@@ -12,7 +12,7 @@ class AtomSlackSnippetsView extends SelectListView
         @addClass 'overlay from-top'
         @items = []
         for i in [channels..., users...]
-            v = if i.name? then i.name else i.real_name
+            v = if i.profile? then i.profile.real_name else i.name
             @items.push({id:i.id, name:v})
         @setItems @items
         @panel ?= atom.workspace.addModalPanel(item: this)
@@ -50,3 +50,4 @@ class AtomSlackSnippetsView extends SelectListView
 
     cancelled: ->
         console.log "This view was cancelled"
+        @panel.hide()
