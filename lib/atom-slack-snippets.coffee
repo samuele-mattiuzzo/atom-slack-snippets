@@ -36,6 +36,7 @@ module.exports =
       @subscriptions = null
 
   post: ->
+      @token = atom.config.get('atom-slack-snippets.token')
       if @token?
           editor = atom.workspace.getActivePaneItem()
           selection = editor.getSelectedText()
