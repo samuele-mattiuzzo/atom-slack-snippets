@@ -13,7 +13,7 @@ module.exports =
   activate: (state) ->
       @setUp()
       @subscriptions = new CompositeDisposable
-      @subscriptions.add atom.config.onDidChange 'token', =>
+      @subscriptions.add atom.config.onDidChange 'atom-slack-snippets.token', =>
           @destroy()
           @setUp()
 
@@ -36,7 +36,6 @@ module.exports =
       @subscriptions = null
 
   post: ->
-      @token = atom.config.get('atom-slack-snippets.token')
       if @token?
           editor = atom.workspace.getActivePaneItem()
           selection = editor.getSelectedText()
@@ -52,7 +51,6 @@ module.exports =
           @_getChannels()
           @_getUsers()
           setTimeout @_getAllItems.bind(@), 5 * 1000
-      console.log('ok')
 
   _getChannels: ->
       request({
