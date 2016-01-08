@@ -24,12 +24,22 @@ class AtomSlackSnippetsView extends SelectListView
         "name"
 
     confirmed: (item) ->
+        if item.type == 'user'
+            # we need to open an IM channel with the user before sending to him
+            @_postToUser(item.id)
+        else
+            @_postToChannel(item.id)
+
+    cancelled: ->
+        @panel.hide()
+
+    _postToChannel: (channelId) ->
         request({
             uri: 'https://slack.com/api/chat.postMessage',
             qs: {
                 'token': @token,
                 'text': "```#{ @txt }```",
-                'channel': "#{ item.id }",
+                'channel': channelId,
                 'as_user': true,
                 'parse': 'full'
             },
@@ -42,8 +52,18 @@ class AtomSlackSnippetsView extends SelectListView
         )
         .catch( (err) => console.log err )
 
-    cancelled: ->
-        @panel.hide()
+    _postToUser: (userId) ->
+        request({
+            uri: 'https://slack.com/api/im.open',
+            qs: { 'token': @token, 'user': userId },
+            json: true })
+        .then( (body)=>
+            if body['ok'] == false
+                console.log body['error']
+            else
+                @_postToChannel(body['channel']['id'])
+        )
+        .catch( (err) => console.log err )
 
     _escapeSelection: (txt) ->
         # removes incompatible ``` from selection
@@ -54,6 +74,6 @@ class AtomSlackSnippetsView extends SelectListView
     _createItems: (channels, users) ->
         items = []
         for i in [channels..., users...]
-            v = if i.profile? then i.profile.real_name else i.name
-            items.push({id:i.id, name:v})
+            [v, t] = if i.profile? then [i.profile.real_name, 'user'] else [i.name, 'channel']
+            items.push({id:i.id, name:v, type:t})
         items
