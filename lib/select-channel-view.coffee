@@ -15,11 +15,8 @@ class SelectChannelView extends SelectListView
         @channels = []
         @users = []
 
-        @addClass 'overlay from-top'
-        @setItems @_createItems()
-        @panel ?= atom.workspace.addModalPanel(item: @)
-        @panel.show()
-        @focusFilterEditor()
+        @_create()
+
 
     viewForItem: (item) -> "<li>#{ item.name }</li>"
 
@@ -30,13 +27,21 @@ class SelectChannelView extends SelectListView
     cancelled: -> @panel.hide()
 
     # PRIVATE METHODS
-    _createItems: ->
+    _create: ->
         @_getAllItems()
         items = []
-        for i in [channels..., users...]
+        [ch, u] = [null, null]
+        while not ch? and not u?
+            [ch, u] = [@channels, @users]
+        for i in [ch..., u...]
             [v, t] = if i.profile? then [i.profile.real_name, 'user'] else [i.name, 'channel']
             items.push({id:i.id, name:v, type:t})
-        items
+        @setItems items
+
+        @addClass 'overlay from-top'
+        @panel ?= atom.workspace.addModalPanel(item: @)
+        @panel.show()
+        @focusFilterEditor()
 
     _getAllItems: ->
       # loops till we have channels and users to post to,
@@ -44,10 +49,11 @@ class SelectChannelView extends SelectListView
       # needs improvement or better logic elsewhere, otherwise blocks
       # atom's loading for a bit too much
       if @channels.length == 0 and @users.length == 0
-          console.log('fetching')
           @_getChannels()
           @_getUsers()
-          setTimeout @_getAllItems.bind(@), 5 * 1000
+          timer = setTimeout @_getAllItems.bind(@), 5 * 1000
+      else
+          clearTimeout timer
 
     _getChannels: ->
       request({
@@ -56,8 +62,10 @@ class SelectChannelView extends SelectListView
           json: true })
       .then( (body)=>
           if body['ok'] == false
+              # handle error message
               console.log(body['error'])
           else
+              console.log('got the chans')
               @channels = body['channels']
       )
       .catch( (err) => console.log(err) )
@@ -69,8 +77,10 @@ class SelectChannelView extends SelectListView
           json: true })
       .then( (body)=>
           if body['ok'] == false
+              # handle error message
               console.log(body['error'])
           else
+              console.log('got the users')
               @users = body['members']
       )
       .catch( (err) => console.log(err) )

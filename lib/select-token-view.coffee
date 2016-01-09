@@ -1,4 +1,3 @@
-request = require 'request-promise'
 {SelectListView} = require 'atom-space-pen-views'
 SelectChannelView = require './select-channel-view'
 
@@ -26,4 +25,10 @@ class SelectTokenView extends SelectListView
 
     cancelled: -> @panel.hide()
 
-    _createItems: -> atom.config.get('atom-slack-snippets.tokens')
+    _createItems: ->
+        tokens = atom.config.get('atom-slack-snippets.tokens')
+        items = []
+        for item in tokens
+            [n, t] = item.split "|"
+            items.push({'name': n, 'token': t})
+        items

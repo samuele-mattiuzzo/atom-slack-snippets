@@ -1,6 +1,5 @@
-request = require 'request-promise'
 {CompositeDisposable} = require 'atom'
-AtomSlackSnippetsView = require './select-token-view'
+SelectTokenView = require './select-token-view'
 
 
 module.exports =
@@ -10,15 +9,8 @@ module.exports =
           type: 'array'
           default: []
           items:
-              type: 'object'
-              properties:
-                  name:
-                      type: 'string'
-                      default: ''
-                  token:
-                      type: 'string'
-                      default: ''
-
+              type: 'string'
+              default: ''
 
   activate: (state) ->
       @subscriptions = new CompositeDisposable

@@ -4,7 +4,7 @@ request = require 'request-promise'
 
 module.exports =
 
-class PostView extends View
+class PostView extends SelectListView
     # fetches the selected text and posts to the channel (item)
     # using token
     initialize: (item, token)->
@@ -32,9 +32,10 @@ class PostView extends View
             json: true })
         .then( (body)=>
             if body['ok'] == false
+                # handle error message
                 console.log body['error']
             else
-                @panel.hide()
+                # handle success message
         )
         .catch( (err) => console.log err )
 
@@ -45,6 +46,7 @@ class PostView extends View
             json: true })
         .then( (body)=>
             if body['ok'] == false
+                # handle error message
                 console.log body['error']
             else
                 @_postToChannel(body['channel']['id'])
