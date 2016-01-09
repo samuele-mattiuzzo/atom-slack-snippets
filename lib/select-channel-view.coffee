@@ -28,20 +28,7 @@ class SelectChannelView extends SelectListView
 
     # PRIVATE METHODS
     _create: ->
-        @_getAllItems()
-        items = []
-        [ch, u] = [null, null]
-        while not ch? and not u?
-            [ch, u] = [@channels, @users]
-        for i in [ch..., u...]
-            [v, t] = if i.profile? then [i.profile.real_name, 'user'] else [i.name, 'channel']
-            items.push({id:i.id, name:v, type:t})
-        @setItems items
-
-        @addClass 'overlay from-top'
-        @panel ?= atom.workspace.addModalPanel(item: @)
-        @panel.show()
-        @focusFilterEditor()
+        @_getChannels()
 
     _getAllItems: ->
       # loops till we have channels and users to post to,
@@ -67,6 +54,7 @@ class SelectChannelView extends SelectListView
           else
               console.log('got the chans')
               @channels = body['channels']
+              @_getUsers()
       )
       .catch( (err) => console.log(err) )
 
@@ -82,5 +70,18 @@ class SelectChannelView extends SelectListView
           else
               console.log('got the users')
               @users = body['members']
+              @_drawAndSet()
       )
       .catch( (err) => console.log(err) )
+
+    _drawAndSet:->
+        items = []
+        for i in [@channels..., @users...]
+            [v, t] = if i.profile? then [i.profile.real_name, 'user'] else [i.name, 'channel']
+            items.push({id:i.id, name:v, type:t})
+        @setItems items
+
+        @addClass 'overlay from-top'
+        @panel ?= atom.workspace.addModalPanel(item: @)
+        @panel.show()
+        @focusFilterEditor()
