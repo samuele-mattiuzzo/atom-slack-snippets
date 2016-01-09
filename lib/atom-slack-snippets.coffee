@@ -19,7 +19,7 @@ module.exports =
 
   destroy: ->
       @view = null
-      @subscriptions = null
+      @subscriptions.dispose()
 
   post: ->
       # don't fetch token here, use SelectTokenView
