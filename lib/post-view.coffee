@@ -4,34 +4,20 @@ request = require 'request-promise'
 
 module.exports =
 
-class AtomSlackSnippetsView extends SelectListView
-    initialize: (channels, users, token, txt)->
+class PostView extends View
+    # fetches the selected text and posts to the channel (item)
+    # using token
+    initialize: (item, token)->
         super
+        @target = item
         @token = token
-        @items = @_createItems channels, users
-        @txt = @_escapeSelection txt
+        @txt = @_escapeSelection
 
-        @addClass 'overlay from-top'
-        @setItems @items
-        @panel ?= atom.workspace.addModalPanel(item: @)
-        @panel.show()
-        @focusFilterEditor()
-
-    viewForItem: (item) ->
-        "<li>#{ item.name }</li>"
-
-    getFilterKey: ->
-        "name"
-
-    confirmed: (item) ->
         if item.type == 'user'
             # we need to open an IM channel with the user before sending to him
             @_postToUser(item.id)
         else
             @_postToChannel(item.id)
-
-    cancelled: ->
-        @panel.hide()
 
     _postToChannel: (channelId) ->
         request({
@@ -65,15 +51,10 @@ class AtomSlackSnippetsView extends SelectListView
         )
         .catch( (err) => console.log err )
 
-    _escapeSelection: (txt) ->
+    _escapeSelection: ->
+        editor = atom.workspace.getActivePaneItem()
+        txt = editor.getSelectedText()
         # removes incompatible ``` from selection
         # avoids breaking out of the code block
         txt = txt.replace /\`\`\`/g, ''
         txt
-
-    _createItems: (channels, users) ->
-        items = []
-        for i in [channels..., users...]
-            [v, t] = if i.profile? then [i.profile.real_name, 'user'] else [i.name, 'channel']
-            items.push({id:i.id, name:v, type:t})
-        items
