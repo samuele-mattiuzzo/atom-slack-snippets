@@ -21,14 +21,21 @@ class SelectTokenView extends SelectListView
 
     getFilterKey: -> "name"
 
-    confirmed: (item) -> new SelectChannelView(item.token)
+    confirmed: (item) ->
+        @view = new SelectChannelView item.token
 
-    cancelled: -> @panel.hide()
+    cancelled: ->
+        @panel.hide()
 
+    destroy: ->
+        @view = null
+        @panel = null
+
+    # PRIVATE METHODS
     _createItems: ->
-        tokens = atom.config.get('atom-slack-snippets.tokens')
+        tokens = atom.config.get 'atom-slack-snippets.tokens'
         items = []
         for item in tokens
             [n, t] = item.split "|"
-            items.push({'name': n, 'token': t})
+            items.push {'name': n, 'token': t}
         items
