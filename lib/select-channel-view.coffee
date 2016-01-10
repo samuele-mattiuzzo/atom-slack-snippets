@@ -1,6 +1,7 @@
 request = require 'request-promise'
 {SelectListView} = require 'atom-space-pen-views'
 PostView = require './post-view'
+MP = require './message-view'
 
 
 module.exports =
@@ -10,9 +11,12 @@ class SelectChannelView extends SelectListView
     # then spawns a PostView that handles the post
     initialize: (token)->
         super
+        @mp = new MP()
+
         @token = token
         @channels = []
         @users = []
+        @panel ?= atom.workspace.addModalPanel(item: @)
 
         @_create()
 
@@ -42,7 +46,7 @@ class SelectChannelView extends SelectListView
       .then( (body)=>
           if body['ok'] == false
               # handle error message
-              console.log body['error']
+              @_writeMessage body['error']
           else
               @channels = body['channels']
               @_getUsers()
@@ -57,7 +61,7 @@ class SelectChannelView extends SelectListView
       .then( (body)=>
           if body['ok'] == false
               # handle error message
-              console.log body['error']
+              @_writeMessage body['error']
           else
               @users = body['members']
               @_drawAndSet()
@@ -75,3 +79,9 @@ class SelectChannelView extends SelectListView
         @panel ?= atom.workspace.addModalPanel(item: @)
         @panel.show()
         @focusFilterEditor()
+
+    _writeMessage: (message) ->
+        @panel.hide()
+        @mp.setMessage(message)
+        @panel.item = @mp.getElement()
+        @panel.show()

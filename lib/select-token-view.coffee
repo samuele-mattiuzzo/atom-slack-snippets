@@ -1,5 +1,6 @@
 {SelectListView} = require 'atom-space-pen-views'
 SelectChannelView = require './select-channel-view'
+MP = require './message-view'
 
 
 module.exports =
@@ -11,11 +12,16 @@ class SelectTokenView extends SelectListView
     # token will be used to create the channels
     initialize: ->
         super
+        @mp = new MP()
+
         @addClass 'overlay from-top'
         @setItems @_createItems()
         @panel ?= atom.workspace.addModalPanel(item: @)
-        @panel.show()
-        @focusFilterEditor()
+        if @items?.length
+            @panel.show()
+            @focusFilterEditor()
+        else
+            @_writeMessage('Please add token(s) to your settings')
 
     viewForItem: (item) -> "<li>#{ item.name }</li>"
 
@@ -39,3 +45,9 @@ class SelectTokenView extends SelectListView
             [n, t] = item.split "|"
             items.push {'name': n, 'token': t}
         items
+
+    _writeMessage: (message) ->
+        @panel.hide()
+        @mp.setMessage(message)
+        @panel.item = @mp.getElement()
+        @panel.show()
