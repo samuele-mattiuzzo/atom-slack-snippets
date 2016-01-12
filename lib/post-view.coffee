@@ -11,6 +11,7 @@ class PostView extends SelectListView
     initialize: (item, token)->
         super
         @mp = new MP()
+        @panel ?= atom.workspace.addModalPanel(visible=false)
 
         @target = item
         @token = token
@@ -68,5 +69,5 @@ class PostView extends SelectListView
 
     _writeMessage: (message) ->
         @mp.setMessage(message)
-        @panel ?= atom.workspace.addModalPanel(item: @mp.getElement(), visible=false)
+        @panel.item = @mp
         @panel.show()

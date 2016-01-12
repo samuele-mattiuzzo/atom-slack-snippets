@@ -12,9 +12,11 @@ module.exports =
             @element.appendChild(message)
 
         setMessage: (message) ->
+            debugger
             @element.children[0].textContent = message
 
         destroy: ->
             @element.remove()
 
-        getElement: -> @element
+        getElement: ->
+            @element

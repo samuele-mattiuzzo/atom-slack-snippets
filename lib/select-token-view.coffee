@@ -17,6 +17,7 @@ class SelectTokenView extends SelectListView
         @addClass 'overlay from-top'
         @setItems @_createItems()
         @panel ?= atom.workspace.addModalPanel(item: @)
+
         if @items?.length
             @panel.show()
             @focusFilterEditor()
