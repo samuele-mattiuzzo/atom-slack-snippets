@@ -10,8 +10,7 @@ class PostView extends SelectListView
     # using token
     initialize: (item, token)->
         super
-        @mp = new MP()
-        @panel ?= atom.workspace.addModalPanel(visible=false)
+        @panel ?= atom.workspace.addModalPanel({item: @, visible: false})
 
         @target = item
         @token = token
@@ -38,10 +37,10 @@ class PostView extends SelectListView
         .then( (body)=>
             if body['ok'] == false
                 # handle error message
-                @_writeMessage body['error']
+                new MP body['error']
             else
                 # handle success message
-                @_writeMessage 'Your message has been sent'
+                new MP 'Your message has been sent'
         )
         .catch( (err) => console.log err )
 
@@ -53,7 +52,7 @@ class PostView extends SelectListView
         .then( (body)=>
             if body['ok'] == false
                 # handle error message
-                @_writeMessage body['error']
+                new MP body['error']
             else
                 @_postToChannel body['channel']['id']
         )
@@ -66,8 +65,3 @@ class PostView extends SelectListView
         # avoids breaking out of the code block
         txt = txt.replace /\`\`\`/g, ''
         txt
-
-    _writeMessage: (message) ->
-        @mp.setMessage(message)
-        @panel.item = @mp
-        @panel.show()

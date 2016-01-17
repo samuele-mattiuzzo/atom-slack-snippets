@@ -11,7 +11,6 @@ class SelectChannelView extends SelectListView
     # then spawns a PostView that handles the post
     initialize: (token)->
         super
-        @mp = new MP()
 
         @token = token
         @channels = []
@@ -25,7 +24,6 @@ class SelectChannelView extends SelectListView
     getFilterKey: -> "name"
 
     confirmed: (item) ->
-        @panel.hide()
         @view = new PostView item, @token
 
     cancelled: -> @panel.hide()
@@ -46,7 +44,8 @@ class SelectChannelView extends SelectListView
       .then( (body)=>
           if body['ok'] == false
               # handle error message
-              @_writeMessage body['error']
+              @panel.hide()
+              new MP body['error']
           else
               @channels = body['channels']
               @_getUsers()
@@ -61,7 +60,7 @@ class SelectChannelView extends SelectListView
       .then( (body)=>
           if body['ok'] == false
               # handle error message
-              @_writeMessage body['error']
+              new MP body['error']
           else
               @users = body['members']
               @_drawAndSet()
@@ -79,9 +78,3 @@ class SelectChannelView extends SelectListView
         @panel ?= atom.workspace.addModalPanel(item: @)
         @panel.show()
         @focusFilterEditor()
-
-    _writeMessage: (message) ->
-        @panel.hide()
-        @mp.setMessage(message)
-        @panel.item = @mp.getElement()
-        @panel.show()

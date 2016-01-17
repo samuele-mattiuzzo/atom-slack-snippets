@@ -1,22 +1,24 @@
+{SelectListView} = require 'atom-space-pen-views'
+
+
 module.exports =
-    class Message
 
-        constructor: ->
-            # Create root element
-            @element = document.createElement('div')
-            @element.classList.add('snippets')
+class MessageListView extends SelectListView
+    initialize: (message)->
+        super
+        @setItems [message]
+        @addClass 'overlay from-top'
+        @panel ?= atom.workspace.addModalPanel(item: @)
+        @panel.show()
 
-            # Create message element
-            message = document.createElement('div')
-            message.classList.add('message')
-            @element.appendChild(message)
+    viewForItem: (item) -> "<li>#{ item }</li>"
 
-        setMessage: (message) ->
-            debugger
-            @element.children[0].textContent = message
+    confirmed: (item) ->
+        @panel.hide()
 
-        destroy: ->
-            @element.remove()
+    cancelled: ->
+        @panel.hide()
 
-        getElement: ->
-            @element
+    destroy: ->
+        @view = null
+        @panel = null
