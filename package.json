@@ -2,7 +2,7 @@
   "name": "atom-slack-snippets",
   "main": "./lib/atom-slack-snippets",
   "author": "Samuele Mattiuzzo <samumatt@gmail.com>",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Posts the currently selected snippet of text to a Slack channel",
   "repository": "https://github.com/samuele-mattiuzzo/atom-slack-snippets",
   "keywords": [
