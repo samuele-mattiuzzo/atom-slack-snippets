@@ -10,6 +10,7 @@ class MessageListView extends SelectListView
         @addClass 'overlay from-top'
         @panel ?= atom.workspace.addModalPanel(item: @)
         @panel.show()
+        @focusFilterEditor()
 
     viewForItem: (item) -> "<li>#{ item }</li>"
 
