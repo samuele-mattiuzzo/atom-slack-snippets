@@ -1,38 +1,28 @@
 request = require 'request-promise'
 {SelectListView} = require 'atom-space-pen-views'
+MP = require './message-view'
 
 
 module.exports =
 
-class AtomSlackSnippetsView extends SelectListView
-    initialize: (channels, users, token, txt)->
+class PostView extends SelectListView
+    # fetches the selected text and posts to the channel (item)
+    # using token
+    initialize: (item, token)->
         super
+        @panel ?= atom.workspace.addModalPanel({item: @, visible: false})
+
+        @target = item
         @token = token
-        @items = @_createItems channels, users
-        @txt = @_escapeSelection txt
+        @txt = @_escapeSelection()
 
-        @addClass 'overlay from-top'
-        @setItems @items
-        @panel ?= atom.workspace.addModalPanel(item: @)
-        @panel.show()
-        @focusFilterEditor()
-
-    viewForItem: (item) ->
-        "<li>#{ item.name }</li>"
-
-    getFilterKey: ->
-        "name"
-
-    confirmed: (item) ->
         if item.type == 'user'
             # we need to open an IM channel with the user before sending to him
-            @_postToUser(item.id)
+            @_postToUser item.id
         else
-            @_postToChannel(item.id)
+            @_postToChannel item.id
 
-    cancelled: ->
-        @panel.hide()
-
+    # PRIVATE METHODS
     _postToChannel: (channelId) ->
         request({
             uri: 'https://slack.com/api/chat.postMessage',
@@ -46,9 +36,11 @@ class AtomSlackSnippetsView extends SelectListView
             json: true })
         .then( (body)=>
             if body['ok'] == false
-                console.log body['error']
+                # handle error message
+                new MP body['error']
             else
-                @panel.hide()
+                # handle success message
+                new MP 'Your message has been sent'
         )
         .catch( (err) => console.log err )
 
@@ -59,21 +51,17 @@ class AtomSlackSnippetsView extends SelectListView
             json: true })
         .then( (body)=>
             if body['ok'] == false
-                console.log body['error']
+                # handle error message
+                new MP body['error']
             else
-                @_postToChannel(body['channel']['id'])
+                @_postToChannel body['channel']['id']
         )
         .catch( (err) => console.log err )
 
-    _escapeSelection: (txt) ->
+    _escapeSelection: ->
+        editor = atom.workspace.getActivePaneItem()
+        txt = editor.getSelectedText()
         # removes incompatible ``` from selection
         # avoids breaking out of the code block
         txt = txt.replace /\`\`\`/g, ''
         txt
-
-    _createItems: (channels, users) ->
-        items = []
-        for i in [channels..., users...]
-            [v, t] = if i.profile? then [i.profile.real_name, 'user'] else [i.name, 'channel']
-            items.push({id:i.id, name:v, type:t})
-        items
