@@ -4,7 +4,7 @@
 Atom Slack Snippets is a plugin for [Atom](http://atom.io) editor that allows you to post a selection of text to a [Slack](https://slack.com) channel
 
 
-![Atom Slack Snippets 0.1.0 in action](https://github.com/samuele-mattiuzzo/atom-slack-snippets/blob/master/demo.gif?raw=true)
+![Atom Slack Snippets 0.2.0 in action](https://github.com/samuele-mattiuzzo/atom-slack-snippets/blob/master/demo.gif?raw=true)
 
 ![Posted message](https://github.com/samuele-mattiuzzo/atom-slack-snippets/blob/master/result.png?raw=true)
 
@@ -18,7 +18,8 @@ Atom Slack Snippets is a plugin for [Atom](http://atom.io) editor that allows yo
 
 ### Configuration
 
-* `token ` &mdash; Slack API token
+* `tokens ` &mdash; Slack API token, comma separated list
+    * the token must be in the following format: `name|value (eg: sam|e1x2a3m4p5l6e7)`
 
 
 ### Copyright
